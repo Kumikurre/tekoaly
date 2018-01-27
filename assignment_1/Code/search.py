@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -87,7 +87,37 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+
+    from util import Stack
+    print "Start:", problem.getStartState()
+    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
+    print "Start's successors:", problem.getSuccessors(problem.getStartState())
+
+    visited_nodes = []
+    path = []
+    stack = Stack()
+    for item in problem.getSuccessors(problem.getStartState()):
+        stack.push(item)
+
+    while stack.isEmpty() == False:
+        #pop the last node from the stack & put it to the visited nodes and to the path
+        current_node = stack.pop()
+        visited_nodes.append(current_node[0])
+        path.append(current_node[1])
+
+        #return the path if the current node is the goal
+        if problem.isGoalState(current_node[0]) == True:
+            return path
+
+        #if its not the goal, take the successors of the current node
+        successors = problem.getSuccessors(current_node[0])
+        #put all the successors in the stack if they haven't been visited yet
+        for successor_node in successors:
+            if successor_node[0] not in visited_nodes:
+                stack.push(successor_node)
+
+    return path
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
