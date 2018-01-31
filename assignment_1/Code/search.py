@@ -88,45 +88,41 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
 
-
     from util import Stack
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
 
-    visited_nodes = []
-    stack = Stack()
+    visited = []
+    stack   = Stack()
+
     for item in problem.getSuccessors(problem.getStartState()):
-        to_push = {}
-        to_push['node'] = item
-        to_push['path'] = [item[1]]
-        stack.push(to_push)
+        node         = {}
+        node['node'] = item
+        node['path'] = [item[1]]
+        stack.push(node)
 
     while not stack.isEmpty():
         #pop a node from the stack & put it to the visited nodes and to the path
-        node = stack.pop()
-        curr_node = node['node']
-        path = node['path']
+        temp = stack.pop()
+        node = temp['node']
+        path = temp['path']
 
-        if curr_node[0] not in visited_nodes:
-            visited_nodes.append(curr_node[0])
+        if node[0] not in visited:
+            visited.append(node[0])
 
             #return the path if the current node is the goal
-            if problem.isGoalState(curr_node[0]):
+            if problem.isGoalState(node[0]):
                 return path
 
             #if it's not the goal, take the successors of the current node
-            successors = problem.getSuccessors(curr_node[0])
+            successors = problem.getSuccessors(node[0])
 
             #put all the successors in the stack if they haven't been visited yet
-            for successor_node in successors:
+            for successor in successors:
                 to_push = {}
                 temp = path[:]
-                temp.append(successor_node[1])
-                to_push['node'] = successor_node
+                temp.append(successor[1])
+                to_push['node'] = successor
                 to_push['path'] = temp
                 stack.push(to_push)
-
     return path
 
 def breadthFirstSearch(problem):
