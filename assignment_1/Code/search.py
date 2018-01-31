@@ -93,6 +93,7 @@ def depthFirstSearch(problem):
     visited = []
     stack   = Stack()
 
+    # initialize stack with start states' successors
     for item in problem.getSuccessors(problem.getStartState()):
         node         = {}
         node['node'] = item
@@ -100,7 +101,7 @@ def depthFirstSearch(problem):
         stack.push(node)
 
     while not stack.isEmpty():
-        #pop a node from the stack & put it to the visited nodes and to the path
+        # pop a node from the stack & expand if it hasn't been visited
         temp = stack.pop()
         node = temp['node']
         path = temp['path']
@@ -108,15 +109,13 @@ def depthFirstSearch(problem):
         if node[0] not in visited:
             visited.append(node[0])
 
-            #return the path if the current node is the goal
+            # return the path if the current node is the goal
             if problem.isGoalState(node[0]):
                 return path
 
-            #if it's not the goal, take the successors of the current node
-            successors = problem.getSuccessors(node[0])
-
-            #put all the successors in the stack if they haven't been visited yet
-            for successor in successors:
+            # if it's not the goal, take the successors of the current node
+            # and add to stack
+            for successor in problem.getSuccessors(node[0]):
                 to_push = {}
                 temp = path[:]
                 temp.append(successor[1])
@@ -128,7 +127,40 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import Queue
+
+    visited = []
+    q = Queue()
+    # initialize queue with start states' successors
+    for item in problem.getSuccessors(problem.getStartState()):
+        node         = {}
+        node['node'] = item
+        node['path'] = [item[1]]
+        q.push(node)
+
+    while not q.isEmpty():
+        # pop a node from the queue & expand if it hasn't been visited
+        temp = q.pop()
+        node = temp['node']
+        path = temp['path']
+
+        if node[0] not in visited:
+            visited.append(node[0])
+
+            #return the path if the current node is the goal
+            if problem.isGoalState(node[0]):
+                return path
+
+            # if it's not the goal, take the successors of the current node
+            # and add to queue
+            for successor in problem.getSuccessors(node[0]):
+                to_push = {}
+                temp = path[:]
+                temp.append(successor[1])
+                to_push['node'] = successor
+                to_push['path'] = temp
+                q.push(to_push)
+    return path
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
