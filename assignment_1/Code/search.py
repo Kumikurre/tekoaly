@@ -100,23 +100,23 @@ def depthFirstSearch(problem):
     for item in problem.getSuccessors(problem.getStartState()):
         stack.push(item)
 
-    while stack.isEmpty() == False:
-        #pop the last node from the stack & put it to the visited nodes and to the path
-        current_node = stack.pop()
-        visited_nodes.append(current_node[0])
-        path.append(current_node[1])
+    while not stack.isEmpty():
+        #pop a node from the stack & put it to the visited nodes and to the path
+        current_node, action, cost = stack.pop()
+
+        path.append(action)
 
         #return the path if the current node is the goal
-        if problem.isGoalState(current_node[0]) == True:
+        if problem.isGoalState(current_node):
             return path
 
         #if its not the goal, take the successors of the current node
-        successors = problem.getSuccessors(current_node[0])
+        successors = problem.getSuccessors(current_node)
         #put all the successors in the stack if they haven't been visited yet
         for successor_node in successors:
             if successor_node[0] not in visited_nodes:
                 stack.push(successor_node)
-
+                visited_nodes.append(successor_node[0])
     return path
 
 def breadthFirstSearch(problem):
