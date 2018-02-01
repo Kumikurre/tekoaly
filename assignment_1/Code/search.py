@@ -117,11 +117,11 @@ def depthFirstSearch(problem):
             # if it's not the goal, take the successors of the current node
             # and add to stack
             for successor in problem.getSuccessors(node[0]):
-                to_push = {}
-                temp    = path[:]
-                temp.append(successor[1])
+                to_push   = {}
+                temp_path = path[:]
+                temp_path.append(successor[1])
                 to_push['node'] = successor
-                to_push['path'] = temp
+                to_push['path'] = temp_path
                 stack.push(to_push)
     return path
 
@@ -157,11 +157,11 @@ def breadthFirstSearch(problem):
             # if it's not the goal, take the successors of the current node
             # and add to queue
             for successor in problem.getSuccessors(node[0]):
-                to_push = {}
-                temp    = path[:]
-                temp.append(successor[1])
+                to_push   = {}
+                temp_path = path[:]
+                temp_path.append(successor[1])
                 to_push['node'] = successor
-                to_push['path'] = temp
+                to_push['path'] = temp_path
                 q.push(to_push)
     return path
 
@@ -179,6 +179,7 @@ def uniformCostSearch(problem):
         node         = {}
         node['node'] = item
         node['path'] = [item[1]]
+        node['cost'] = item[2]
         q.push(node, node['node'][2])
 
     while not q.isEmpty():
@@ -186,9 +187,14 @@ def uniformCostSearch(problem):
         temp = q.pop()
         node = temp['node']
         path = temp['path']
+        try:
+            cost = temp['cost']
+        except KeyError:
+            continue
 
         if node[0] not in visited:
             visited.append(node[0])
+
 
             #return the path if the current node is the goal
             if problem.isGoalState(node[0]):
@@ -197,12 +203,13 @@ def uniformCostSearch(problem):
             # if it's not the goal, take the successors of the current node
             # and add to queue
             for successor in problem.getSuccessors(node[0]):
-                to_push = {}
-                temp    = path[:]
-                temp.append(successor[1])
+                to_push   = {}
+                temp_path = path[:]
+                temp_path.append(successor[1])
                 to_push['node'] = successor
-                to_push['path'] = temp
-                q.push(to_push, to_push['node'][2])
+                to_push['path'] = temp_path
+                to_push['cost'] = to_push['node'][2] + cost
+                q.push(to_push, to_push['cost'])
     return path
 
 
