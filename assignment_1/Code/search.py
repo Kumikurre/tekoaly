@@ -90,11 +90,12 @@ def depthFirstSearch(problem):
 
     from util import Stack
 
-    visited = []
+    start   = problem.getStartState()
+    visited = [start]
     stack   = Stack()
 
     # initialize stack with start states' successors
-    for item in problem.getSuccessors(problem.getStartState()):
+    for item in problem.getSuccessors(start):
         node         = {}
         node['node'] = item
         node['path'] = [item[1]]
@@ -117,7 +118,7 @@ def depthFirstSearch(problem):
             # and add to stack
             for successor in problem.getSuccessors(node[0]):
                 to_push = {}
-                temp = path[:]
+                temp    = path[:]
                 temp.append(successor[1])
                 to_push['node'] = successor
                 to_push['path'] = temp
@@ -127,12 +128,14 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    from util import Queue
 
-    visited = []
-    q = Queue()
+    from util import Queue
+    start   = problem.getStartState()
+    visited = [start]
+    q       = Queue()
+
     # initialize queue with start states' successors
-    for item in problem.getSuccessors(problem.getStartState()):
+    for item in problem.getSuccessors(start):
         node         = {}
         node['node'] = item
         node['path'] = [item[1]]
@@ -155,7 +158,7 @@ def breadthFirstSearch(problem):
             # and add to queue
             for successor in problem.getSuccessors(node[0]):
                 to_push = {}
-                temp = path[:]
+                temp    = path[:]
                 temp.append(successor[1])
                 to_push['node'] = successor
                 to_push['path'] = temp
