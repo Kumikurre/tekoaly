@@ -223,6 +223,7 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+
     from util import PriorityQueue
     start   = problem.getStartState()
     visited = [start]
@@ -234,16 +235,22 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         node['node'] = item
         node['path'] = [item[1]]
         node['dist'] = heuristic(item[0], problem)
-        q.push(node, node['node'][2] + node['dist'])
+        node['cost'] = item[2]
+        q.push(node, node['cost'] + node['dist'])
 
     while not q.isEmpty():
         # pop a node from the queue & expand if it hasn't been visited
         temp = q.pop()
         node = temp['node']
         path = temp['path']
+        try:
+            cost = temp['cost']
+        except KeyError:
+            continue
 
         if node[0] not in visited:
             visited.append(node[0])
+
 
             #return the path if the current node is the goal
             if problem.isGoalState(node[0]):
@@ -252,13 +259,14 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             # if it's not the goal, take the successors of the current node
             # and add to queue
             for successor in problem.getSuccessors(node[0]):
-                to_push = {}
-                temp    = path[:]
-                temp.append(successor[1])
+                to_push   = {}
+                temp_path = path[:]
+                temp_path.append(successor[1])
                 to_push['node'] = successor
-                to_push['path'] = temp
+                to_push['path'] = temp_path
                 to_push['dist'] = heuristic(successor[0], problem)
-                q.push(to_push, to_push['node'][2] + to_push['dist'])
+                to_push['cost'] = to_push['node'][2] + cost
+                q.push(to_push, to_push['cost'] + to_push['dist'])
     return path
 
 
