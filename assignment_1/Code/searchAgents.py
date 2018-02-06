@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -288,6 +288,10 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        print 'walls: ', self.walls
+        print 'startingposition: ', self.startingPosition
+        print 'corners: ', self.corners
+
 
     def getStartState(self):
         """
@@ -295,7 +299,12 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        start_location = self.startingPosition
+        corners = []
+        if start_location in self.corners:
+          corners.append(start_location)
+        return (self.startingPosition, sorted(corners))
+        #util.raiseNotDefined()
 
     def isGoalState(self, state):
         """
