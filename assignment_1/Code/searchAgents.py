@@ -300,10 +300,10 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         start_location = self.startingPosition
-        corners = []
+        visited_corners = []
         if start_location in self.corners:
-          corners.append(start_location)
-        return (self.startingPosition, sorted(corners))
+            visited_corners.append(start_location)
+        return (self.startingPosition, sorted(visited_corners))
         #util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -311,7 +311,12 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        visited_corners = sorted(state[1])
+        if state[0] in self.corners and state[0] not in visited_corners:
+            visited_corners.append(state[0])
+        if set(visited_corners) == set(self.corners):
+            return True
+        return False
 
     def getSuccessors(self, state):
         """
@@ -328,13 +333,18 @@ class CornersProblem(search.SearchProblem):
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-
+            if not hitsWall:
+                successor_corners = sorted(state[1])
+                if (nextx,nexty) in self.corners:
+                    if (nextx,nexty) not in successor_corners:
+                        successor_corners.append((nextx,nexty))
+                successors.append((((nextx,nexty), successor_corners), action, 1))
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
