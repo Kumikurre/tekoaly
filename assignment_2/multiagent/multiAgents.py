@@ -91,13 +91,13 @@ class ReflexAgent(Agent):
             distToFood = util.manhattanDistance(food, newPos)
             if(distToFood < shortestPathFood):
                 shortestPathFood = distToFood
-        evaluation_rating += 1/shortestPathFood * 10
+        evaluation_rating += 10/shortestPathFood
 
         # moving to adjacent states removes food
         if(currentGameState.getNumFood() > successorGameState.getNumFood()):
             evaluation_rating += 150
 
-        # ghost proximity
+        # non scared ghost proximity
         ghosts = currentGameState.getGhostPositions()
         shortestPathGhost = bignum
         for ghost in ghosts:
@@ -108,10 +108,22 @@ class ReflexAgent(Agent):
             evaluation_rating -= (bignum - 1000)
         else:
             if shortestPathGhost < bignum:
-                evaluation_rating -= 1/shortestPathGhost * 10
+                evaluation_rating -= 1/shortestPathGhost
 
+        #scared ghost proximity
+        # ghosts = currentGameState.getGhostPositions()
+        # shortestPathGhost = bignum
+        # for ghost in ghosts:
+        #     distToGhost = util.manhattanDistance(ghost, newPos)
+        #     if(distToGhost < shortestPathGhost):
+        #         shortestPathGhost = distToGhost
+        # if(shortestPathGhost == 0):
+        #     evaluation_rating -= (bignum - 1000)
+        # else:
+        #     if shortestPathGhost < bignum:
+        #         evaluation_rating -= 1/shortestPathGhost * 10
 
-        # ghosts are scared for more than 3 seconds so pacman is free to move around
+        # both ghosts are scared for more than 3 seconds so pacman is free to move around
         minimumtime = bignum
         for time in newScaredTimes:
             if time < minimumtime:
