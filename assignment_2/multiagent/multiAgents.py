@@ -76,14 +76,14 @@ class ReflexAgent(Agent):
         "*** YOUR CODE HERE ***"
         # this is the variable that is incremented for favourable events and then returned
         evaluation_rating = 0
+
+        # just to initialize a big number, where other values can be compared
         import sys
         bignum = sys.maxint
 
         # there are few favourable events: distance to food is good, action removes food,
         # distance to ghosts is big, or distance to capsules (in the corners) is small
         # stopping could be counted as an unfavourable option
-
-        #evaluation_rating += successorGameState.getScore()
 
         # food is close
         shortestPathFood = bignum
@@ -93,7 +93,7 @@ class ReflexAgent(Agent):
                 shortestPathFood = distToFood
         evaluation_rating += 1/shortestPathFood * 10
 
-        # moving removes food
+        # moving to adjacent states removes food
         if(currentGameState.getNumFood() > successorGameState.getNumFood()):
             evaluation_rating += 150
 
@@ -109,6 +109,30 @@ class ReflexAgent(Agent):
         else:
             if shortestPathGhost < bignum:
                 evaluation_rating -= 1/shortestPathGhost * 10
+
+
+        # ghosts are scared for more than 3 seconds so pacman is free to move around
+        minimumtime = bignum
+        for time in newScaredTimes:
+            if time < minimumtime:
+                minimumtime = time
+        if minimumtime > 3:
+            evaluation_rating += 500
+
+        # distance to capsule
+        successorCapsules = successorGameState.getCapsules()
+        shortestPathCapsule = bignum
+        for capsule in successorCapsules:
+            distToCapsule = util.manhattanDistance(capsule, newPos)
+            if(distToCapsule < shortestPathCapsule):
+                shortestPathCapsule = distToCapsule
+        evaluation_rating += 1/shortestPathCapsule * (200/150)
+
+        # amount of capsules
+        currentCapsules = currentGameState.getCapsules()
+        if(len(currentCapsules) > len(successorCapsules)):
+            evaluation_rating += 200
+
 
         # stopping
         if action == Directions.STOP:
