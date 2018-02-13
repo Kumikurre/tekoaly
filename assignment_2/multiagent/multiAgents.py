@@ -110,7 +110,9 @@ class ReflexAgent(Agent):
             if shortestPathGhost < bignum:
                 evaluation_rating -= 1/shortestPathGhost
 
-        #scared ghost proximity
+        # scared ghost proximity
+        # could implement a function that increments evaluation_rating if a scared ghost is near...
+
         # ghosts = currentGameState.getGhostPositions()
         # shortestPathGhost = bignum
         # for ghost in ghosts:
@@ -175,7 +177,35 @@ class MultiAgentSearchAgent(Agent):
 
       Note: this is an abstract class: one that should not be instantiated.  It's
       only partially specified, and designed to be extended.  Agent (game.py)
-      is another abstract class.
+      is another abstract class.numAgent = gameState.getNumAgents()
+        ActionScore = []
+
+        def _rmStop(List):
+          return [x for x in List if x != 'Stop']
+
+        def _miniMax(s, iterCount):
+          if iterCount >= self.depth*numAgent or s.isWin() or s.isLose():
+            return self.evaluationFunction(s)
+          if iterCount%numAgent != 0: #Ghost min
+            result = 1e10
+            for a in _rmStop(s.getLegalActions(iterCount%numAgent)):
+              sdot = s.generateSuccessor(iterCount%numAgent,a)
+              result = min(result, _miniMax(sdot, iterCount+1))
+            return result
+          else: # Pacman Max
+            result = -1e10
+            for a in _rmStop(s.getLegalActions(iterCount%numAgent)):
+              sdot = s.generateSuccessor(iterCount%numAgent,a)
+              result = max(result, _miniMax(sdot, iterCount+1))
+              if iterCount == 0:
+                ActionScore.append(result)
+            return result
+
+        result = _miniMax(gameState, 0);
+        #print _rmStop(gameState.getLegalActions(0)), ActionScore
+        return _rmStop(gameState.getLegalActions(0))[ActionScore.index(max(ActionScore))]
+        #util.raiseNotDefined()
+
     """
 
     def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
@@ -206,7 +236,50 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        import sys
+        bignum = sys.maxint
+        agents_amount = gameState.getNumAgents()
+        movement_value = []
+
+        # Helper function for removing all occurrences of 'Stop' from a list
+        def remove_stops_from_list(list):
+            return [x for x in list if x != 'Stop']
+
+        # Calculates max value for Pacman movement
+        def max_val(startstate, iteration_count):
+            result = bignum * (-1)
+            for action in remove_stops_from_list(startstate.getLegalActions(iteration_count % agents_amount)):
+                successors = startstate.generateSuccessor(iteration_count % agents_amount,action)
+                result = max(result, minimax(successors, iteration_count + 1))
+                if iteration_count == 0:
+                    movement_value.append(result)
+            return result
+
+        # Calculates min value for ghost movement
+        def min_val(startstate, iteration_count):
+            result = bignum
+            for action in remove_stops_from_list(startstate.getLegalActions(iteration_count % agents_amount)):
+                successors = startstate.generateSuccessor(iteration_count % agents_amount, action)
+                result = min(result, minimax(successors, iteration_count+1))
+            return result
+
+        # The complete minimax function that calls min_val and max_val when necessary
+        # iteration_count % agents_amount tells us whether we should call minimax for pacman or for ghosts,
+        # agents_amount[0] == pacman and all other agents are ghosts.
+        def minimax(startstate,iteration_count):
+            if iteration_count >= self.depth * agents_amount or startstate.isWin() or startstate.isLose():
+                return self.evaluationFunction(startstate)
+            if iteration_count % agents_amount != 0:
+                return min_val(startstate, iteration_count)
+            else:
+                return max_val(startstate, iteration_count)
+
+        result = minimax(gameState, 0)
+        movement_direction = remove_stops_from_list(gameState.getLegalActions(0))[movement_value.index(max(movement_value))]
+        #print 'movement_direction: ', movement_direction
+        return movement_direction
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
