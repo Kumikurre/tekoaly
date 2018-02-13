@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -74,7 +74,48 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        # this is the variable that is incremented for favourable events and then returned
+        evaluation_rating = 0
+        import sys
+        bignum = sys.maxint
+
+        # there are few favourable events: distance to food is good, action removes food,
+        # distance to ghosts is big, or distance to capsules (in the corners) is small
+        # stopping could be counted as an unfavourable option
+
+        #evaluation_rating += successorGameState.getScore()
+
+        # food is close
+        shortestPathFood = bignum
+        for food in newFood.asList():
+            distToFood = util.manhattanDistance(food, newPos)
+            if(distToFood < shortestPathFood):
+                shortestPathFood = distToFood
+        evaluation_rating += 1/shortestPathFood * 10
+
+        # moving removes food
+        if(currentGameState.getNumFood() > successorGameState.getNumFood()):
+            evaluation_rating += 150
+
+        # ghost proximity
+        ghosts = currentGameState.getGhostPositions()
+        shortestPathGhost = bignum
+        for ghost in ghosts:
+            distToGhost = util.manhattanDistance(ghost, newPos)
+            if(distToGhost < shortestPathGhost):
+                shortestPathGhost = distToGhost
+        if(shortestPathGhost == 0):
+            evaluation_rating -= (bignum - 1000)
+        else:
+            if shortestPathGhost < bignum:
+                evaluation_rating -= 1/shortestPathGhost * 10
+
+        # stopping
+        if action == Directions.STOP:
+            evaluation_rating -= 5
+
+        #print evaluation_rating
+        return evaluation_rating
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -170,4 +211,3 @@ def betterEvaluationFunction(currentGameState):
 
 # Abbreviation
 better = betterEvaluationFunction
-
