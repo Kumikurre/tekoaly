@@ -271,8 +271,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
             if iteration_count >= self.depth * agents_amount or startstate.isWin() or startstate.isLose():
                 return self.evaluationFunction(startstate)
             if iteration_count % agents_amount != 0:
+                #This is called for ghosts
                 return min_val(startstate, iteration_count)
             else:
+                #This is called for the pacman
                 return max_val(startstate, iteration_count)
 
         result = minimax(gameState, 0)
