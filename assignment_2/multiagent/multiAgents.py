@@ -308,7 +308,35 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        import sys
+        bignum = sys.maxint
+        agents_amount = gameState.getNumAgents()
+        movement_value = []
+
+        def terminal(gameState, depth):
+            if depth == 0 or gameState.isWin() or gameState.isLose():
+                return True
+            return False
+
+        def exp_val(gameState, depth):
+            v = 0
+            # for successor of state:
+            #   p = probability(successor)
+            #   v += p * value(successor)
+            return v
+
+        def max_val(gameState, depth):
+            v = bignum * (-1.0) # 'negative infinity'
+            # for successor of state:
+            #   v = max(v, value(successor))
+            return v
+
+        if terminal(gameState, self.depth):
+            #return state's utility
+        elif 0: #next agent is MAX:
+            return max_val(gameState, self.depth)
+        elif 0: #next agent is EXP
+            return exp_val(gameState, depth)
 
 def betterEvaluationFunction(currentGameState):
     """
