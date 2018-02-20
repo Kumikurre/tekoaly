@@ -250,8 +250,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
         def max_val(startstate, iteration_count):
             result = bignum * (-1)
             for action in remove_stops_from_list(startstate.getLegalActions(iteration_count % agents_amount)):
-                successors = startstate.generateSuccessor(iteration_count % agents_amount,action)
-                result = max(result, minimax(successors, iteration_count + 1))
+                successor = startstate.generateSuccessor(iteration_count % agents_amount,action)
+                result = max(result, minimax(successor, iteration_count + 1))
                 if iteration_count == 0:
                     movement_value.append(result)
             return result
@@ -260,8 +260,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
         def min_val(startstate, iteration_count):
             result = bignum
             for action in remove_stops_from_list(startstate.getLegalActions(iteration_count % agents_amount)):
-                successors = startstate.generateSuccessor(iteration_count % agents_amount, action)
-                result = min(result, minimax(successors, iteration_count+1))
+                successor = startstate.generateSuccessor(iteration_count % agents_amount, action)
+                result = min(result, minimax(successor, iteration_count+1))
             return result
 
         # The complete minimax function that calls min_val and max_val when necessary
@@ -277,7 +277,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
                 #This is called for the pacman
                 return max_val(startstate, iteration_count)
 
-        result = minimax(gameState, 0)
+        minimax(gameState, 0)
         movement_direction = remove_stops_from_list(gameState.getLegalActions(0))[movement_value.index(max(movement_value))]
         #print 'movement_direction: ', movement_direction
         return movement_direction
@@ -313,30 +313,43 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         agents_amount = gameState.getNumAgents()
         movement_value = []
 
-        def terminal(gameState, depth):
-            if depth == 0 or gameState.isWin() or gameState.isLose():
-                return True
-            return False
+        # Helper function for removing all occurrences of 'Stop' from a list
+        def remove_stops_from_list(list):
+            return [x for x in list if x != 'Stop']
 
-        def exp_val(gameState, depth):
-            v = 0
-            # for successor of state:
-            #   p = probability(successor)
-            #   v += p * value(successor)
-            return v
+        # Calculates max value for Pacman movement
+        def max_val(startstate, iteration_count):
+            result = bignum * (-1)
+            for action in remove_stops_from_list(startstate.getLegalActions(iteration_count % agents_amount)):
+                successor = startstate.generateSuccessor(iteration_count % agents_amount,action)
+                result = max(result, value(successor, iteration_count + 1))
+                if iteration_count == 0:
+                    movement_value.append(result)
+            return result
 
-        def max_val(gameState, depth):
-            v = bignum * (-1.0) # 'negative infinity'
-            # for successor of state:
-            #   v = max(v, value(successor))
-            return v
+        # Calculates exp value for ghost movement
+        def exp_val(startstate, iteration_count):
+            result = 0
+            for action in remove_stops_from_list(startstate.getLegalActions(iteration_count % agents_amount)):
+                successor = startstate.generateSuccessor(iteration_count % agents_amount, action)
+                # probability of an action, ghosts random
+                p = 1.0 / float(len(startstate.getLegalActions(iteration_count % agents_amount)))
+                result += p * value(successor, iteration_count + 1)
+            return result
 
-        if terminal(gameState, self.depth):
-            #return state's utility
-        elif 0: #next agent is MAX:
-            return max_val(gameState, self.depth)
-        elif 0: #next agent is EXP
-            return exp_val(gameState, depth)
+        def value(state, iteration_count):
+            if (iteration_count >= self.depth * agents_amount) or state.isWin() or state.isLose():
+                return self.evaluationFunction(state)
+            if iteration_count % agents_amount: #ghost
+                return exp_val(state, iteration_count)
+            else: #pacman
+                return max_val(state, iteration_count)
+
+        result = value(gameState, 0)
+        movement_direction = remove_stops_from_list(gameState.getLegalActions(0))[movement_value.index(max(movement_value))]
+        #print 'movement_direction: ', movement_direction
+        return movement_direction
+
 
 def betterEvaluationFunction(currentGameState):
     """
