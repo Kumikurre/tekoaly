@@ -318,22 +318,22 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             return [x for x in list if x != 'Stop']
 
         # Calculates max value for Pacman movement
-        def max_val(startstate, iteration_count):
+        def max_val(state, iteration_count):
             result = bignum * (-1)
-            for action in remove_stops_from_list(startstate.getLegalActions(iteration_count % agents_amount)):
-                successor = startstate.generateSuccessor(iteration_count % agents_amount,action)
+            for action in remove_stops_from_list(state.getLegalActions(iteration_count % agents_amount)):
+                successor = state.generateSuccessor(iteration_count % agents_amount,action)
                 result = max(result, value(successor, iteration_count + 1))
                 if iteration_count == 0:
                     movement_value.append(result)
             return result
 
         # Calculates exp value for ghost movement
-        def exp_val(startstate, iteration_count):
+        def exp_val(state, iteration_count):
             result = 0
-            for action in remove_stops_from_list(startstate.getLegalActions(iteration_count % agents_amount)):
-                successor = startstate.generateSuccessor(iteration_count % agents_amount, action)
+            for action in remove_stops_from_list(state.getLegalActions(iteration_count % agents_amount)):
+                successor = state.generateSuccessor(iteration_count % agents_amount, action)
                 # probability of an action, ghosts random
-                p = 1.0 / float(len(startstate.getLegalActions(iteration_count % agents_amount)))
+                p = 1.0 / float(len(state.getLegalActions(iteration_count % agents_amount)))
                 result += p * value(successor, iteration_count + 1)
             return result
 
