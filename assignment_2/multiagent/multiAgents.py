@@ -322,7 +322,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             result = bignum * (-1)
             for action in remove_stops_from_list(state.getLegalActions(iteration_count % agents_amount)):
                 successor = state.generateSuccessor(iteration_count % agents_amount,action)
-                result = max(result, value(successor, iteration_count + 1))
+                result = max(result, expectimax(successor, iteration_count + 1))
                 if iteration_count == 0:
                     movement_value.append(result)
             return result
@@ -334,10 +334,10 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                 successor = state.generateSuccessor(iteration_count % agents_amount, action)
                 # probability of an action, ghosts random
                 p = 1.0 / float(len(state.getLegalActions(iteration_count % agents_amount)))
-                result += p * value(successor, iteration_count + 1)
+                result += p * expectimax(successor, iteration_count + 1)
             return result
 
-        def value(state, iteration_count):
+        def expectimax(state, iteration_count):
             if (iteration_count >= self.depth * agents_amount) or state.isWin() or state.isLose():
                 return self.evaluationFunction(state)
             if iteration_count % agents_amount: #ghost
@@ -345,7 +345,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             else: #pacman
                 return max_val(state, iteration_count)
 
-        result = value(gameState, 0)
+        expectimax(gameState, 0)
         movement_direction = remove_stops_from_list(gameState.getLegalActions(0))[movement_value.index(max(movement_value))]
         #print 'movement_direction: ', movement_direction
         return movement_direction
