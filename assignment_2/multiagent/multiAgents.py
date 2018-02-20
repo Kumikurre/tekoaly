@@ -11,7 +11,7 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-
+from numpy import inf
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -293,7 +293,89 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.value(gameState, 0, 0, -inf, inf)[1]
+    
+    def value(self, state, agentIndex, level, alpha, beta):
+        # No need to continue processing further if game is finished
+        if state.isWin() or state.isLose():
+            return (self.evaluationFunction(state), "STOP")
+        else:
+            # If agent is pacman, use max-value
+            if agentIndex == 0:
+                return self.maxvalue(state, agentIndex, level, alpha, beta)
+            # If agent is last ghost, use index 0 with +1 level added
+            elif agentIndex == state.getNumAgents():
+                return self.value(state, 0, level + 1, alpha, beta)
+            # Use min-value for other cases which is ghosts
+            else:
+                return self.minvalue(state, agentIndex, level, alpha, beta)
+        
+    def maxvalue(self, state, agentIndex, level, alpha, beta):
+        # Initalize value
+        maxVal = -inf
+        # Get possible actions
+        actions = state.getLegalActions(agentIndex)
+        # No need to continue processing further if game is finished
+        if state.isWin() or state.isLose():
+            return self.evaluationFunction(state)
+        # Default to stop-action
+        bestAction = "Stop"
+        for action in actions:
+            score = self.value(state.generateSuccessor(agentIndex, action), agentIndex + 1, level, alpha, beta)
+            if score[0] > maxVal:
+                maxVal = score[0]
+                bestAction = action
+            else:
+                pass
+            if maxVal > beta:
+               return (maxVal, bestAction)
+            else:
+                pass
+            # Max's best option on path to root
+            alpha = max(maxVal, alpha)
+            result = (maxVal, bestAction)
+
+        return result
+
+    def minvalue(self, state, agentIndex, level, alpha, beta):
+        # Initialize value
+        minVal = inf
+        # Get possible actions
+        actions = state.getLegalActions(agentIndex)
+
+        bestAction = "Stop"
+        # No need to continue processing further if game is finished
+        if state.isWin() or state.isLose():
+            return self.evaluationFunction(state)
+        if level == self.depth - 1 and agentIndex == (state.getNumAgents() - 1):
+            # Loop for all successors of state
+            for action in actions:
+                successor = state.generateSuccessor(agentIndex, action)
+                evaluation = self.evaluationFunction(successor)
+                scoreAction = (evaluation, action, alpha, beta)
+                if scoreAction[0] < minVal:
+                    minVal = scoreAction[0]
+                    bestAction = action
+                    if minVal < alpha:
+                        return (minVal, bestAction)
+                    # Min's best option on path to root
+                    beta = min(minVal, beta)
+            result = (minVal, bestAction)
+            return result
+        else:
+            # Loop for all successors of state
+            for action in actions:
+                successor = state.generateSuccessor(agentIndex, action)
+                scoreAction = self.value(successor, agentIndex + 1, level, alpha, beta)
+                if scoreAction[0] < minVal:
+                    minVal = scoreAction[0]
+                    bestAction = action
+                    if minVal < alpha:
+                        return (minVal, bestAction)
+                    # Min's best option on path to root
+                    beta = min(minVal, beta)
+            result = (minVal, bestAction)
+            return result
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
