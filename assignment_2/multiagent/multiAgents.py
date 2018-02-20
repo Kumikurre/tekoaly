@@ -266,7 +266,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # The complete minimax function that calls min_val and max_val when necessary
         # iteration_count % agents_amount tells us whether we should call minimax for pacman or for ghosts,
         # agents_amount[0] == pacman and all other agents are ghosts.
-        def minimax(startstate,iteration_count):
+        def minimax(startstate, iteration_count):
             if iteration_count >= self.depth * agents_amount or startstate.isWin() or startstate.isLose():
                 return self.evaluationFunction(startstate)
             if iteration_count % agents_amount != 0:
@@ -440,52 +440,63 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-        # This is the evaluation_rating that is incremented or
-        # decremented for different conditions and then returned
+
+    def food_distance(gameState):
+      food_distances = []
+      pacman_location = gameState.getPacmanPosition()
+      for food in gameState.getFood().asList():
+          food_distances.append(1.0/manhattanDistance(pacman_location, food))
+      if len(food_distances)>0:
+          return max(food_distances)
+      else:
+          return 0
+
+     ## COULD IMPLEMENT A CAPSULE DISTANCE FUNC HERE TOO ##
+    # def capsule_distance(gameState):
+    #     capsule_distances = []
+    #     pacman_location = gameState.getPacmanPosition()
+    #     for capsule in gameState.getCapsules().asList():
+    #         capsule_distances.append(1.0/manhattanDistance(pacman_location,capsule))
+    #     if len(capsule_distances)>0:
+    #         return min(capsule_distances)
+    #     else:
+    #         return 0
+
+    def collectables_amount(gameState):
         evaluation_rating = 0
+        food_amount = currentGameState.getNumFood()
+        capsule_amount = len(currentGameState.getCapsules())
+        if food_amount != 0:
+            evaluation_rating = 100.0 / food_amount
+            return evaluation_rating - capsule_amount * 2
+        else:
+            return capsule_amount * (-2)
 
-        import sys
-        bignum = sys.maxint
+    def capsule_distance(gameState):
+      evaluation_rating = []
+      pacman_location = gameState.getPacmanPosition()
+      for capsule_location in gameState.getCapsules():
+          evaluation_rating.append(50.0/manhattanDistance(pacman_location, capsule_location))
+      if len(evaluation_rating) > 0:
+          return max(evaluation_rating)
+      else:
+          return 0
 
-        food = currentGameState.getFood()
-        foodList = food.asList()
-        pacman_position = currentGameState.getPacmanPosition()
+    def ghost_distance(gameState):
+      evaluation_rating = 0
+      pacman_location = gameState.getPacmanPosition()
+      for ghost in gameState.getGhostStates():
+          ghost_distance = manhattanDistance(pacman_location, ghost.getPosition())
+          if ghost.scaredTimer == 0:
+              evaluation_rating -= max(7 - ghost_distance, 0) ** 2
+          else:
+              evaluation_rating += max(8 - ghost_distance, 0) ** 2
+      return evaluation_rating
 
-        ghostStates = currentGameState.getGhostStates()
-        foodList = food.asList()
-        scaredTimes = [ghostState.scaredTimer for ghostState in ghostStates]
-        ghostPositions = currentGameState.getGhostPositions()
-
-        # Increase evaluation_rating for the current score
-        evaluation_rating += currentGameState.getScore() / 100
-
-        # For scared ghosts
-        max_time = 0
-        for time in scaredTimes:
-            if time > max_time:
-                max_time = time
-        evaluation_rating += max_time * 100
-
-        # Finding the nearest food
-        distance = bignum
-        for food in foodList:
-            distToFood = manhattanDistance(pacman_position, food)
-            distance = min(distToFood, distance)
-        evaluation_rating += 1/distance
-
-
-        avgDist = 1
-        ghostCount = 0
-        for ghost in ghostPositions:
-            d = manhattanDistance(ghost, pacman_position)
-            avgDist += d
-            if d <= 15:
-                ghostCount+=1
-            distance = min(d, distance)
-        #evaluation_rating += distance + 1/avgDist
-        #evaluation_rating -= 2000 * ghostCount
-
-        return evaluation_rating
+    evaluation_rating = currentGameState.getScore() + ghost_distance(currentGameState) + food_distance(currentGameState) + capsule_distance(currentGameState)
+    evaluation_rating += collectables_amount(currentGameState)
+    #evaluation_rating += capsule_distance(currentGameState)
+    return evaluation_rating
 
 # Abbreviation
 better = betterEvaluationFunction
