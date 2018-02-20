@@ -440,7 +440,52 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+        # This is the evaluation_rating that is incremented or
+        # decremented for different conditions and then returned
+        evaluation_rating = 0
+
+        import sys
+        bignum = sys.maxint
+
+        food = currentGameState.getFood()
+        foodList = food.asList()
+        pacman_position = currentGameState.getPacmanPosition()
+
+        ghostStates = currentGameState.getGhostStates()
+        foodList = food.asList()
+        scaredTimes = [ghostState.scaredTimer for ghostState in ghostStates]
+        ghostPositions = currentGameState.getGhostPositions()
+
+        # Increase evaluation_rating for the current score
+        evaluation_rating += currentGameState.getScore() / 100
+
+        # For scared ghosts
+        max_time = 0
+        for time in scaredTimes:
+            if time > max_time:
+                max_time = time
+        evaluation_rating += max_time * 100
+
+        # Finding the nearest food
+        distance = bignum
+        for food in foodList:
+            distToFood = manhattanDistance(pacman_position, food)
+            distance = min(distToFood, distance)
+        evaluation_rating += 1/distance
+
+
+        avgDist = 1
+        ghostCount = 0
+        for ghost in ghostPositions:
+            d = manhattanDistance(ghost, pacman_position)
+            avgDist += d
+            if d <= 15:
+                ghostCount+=1
+            distance = min(d, distance)
+        #evaluation_rating += distance + 1/avgDist
+        #evaluation_rating -= 2000 * ghostCount
+
+        return evaluation_rating
 
 # Abbreviation
 better = betterEvaluationFunction
