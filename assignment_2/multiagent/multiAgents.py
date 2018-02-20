@@ -11,7 +11,6 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-from numpy import inf
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -293,8 +292,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        return self.value(gameState, 0, 0, -inf, inf)[1]
-    
+        return self.value(gameState, 0, 0, -float("inf"), float("inf"))[1]
+
     def value(self, state, agentIndex, level, alpha, beta):
         # No need to continue processing further if game is finished
         if state.isWin() or state.isLose():
@@ -309,10 +308,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             # Use min-value for other cases which is ghosts
             else:
                 return self.minvalue(state, agentIndex, level, alpha, beta)
-        
+
     def maxvalue(self, state, agentIndex, level, alpha, beta):
         # Initalize value
-        maxVal = -inf
+        maxVal = -float("inf")
         # Get possible actions
         actions = state.getLegalActions(agentIndex)
         # No need to continue processing further if game is finished
@@ -339,7 +338,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
     def minvalue(self, state, agentIndex, level, alpha, beta):
         # Initialize value
-        minVal = inf
+        minVal = float("inf")
         # Get possible actions
         actions = state.getLegalActions(agentIndex)
 
